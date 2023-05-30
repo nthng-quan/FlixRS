@@ -1,2 +1,12 @@
-# tmb
-Trust me bro
+# FlixRS - FlixRS Recommender System
+## Introduction
+- Introduction...
+## Technical Overview
+- Technical Overview...
+## How to Install
+- How to Install...
+```
+pip install .
+```
+## Usage
+- Usage...
