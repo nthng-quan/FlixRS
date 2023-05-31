@@ -1,42 +1,74 @@
 """
-Streamlit app
+Streamlit App for Movie Recommendations
+
+This app allows users to search for movie recommendations based on their input.
+
 """
 
 import streamlit as st
+import model
 
+# Set page configuration
 st.set_page_config(
     page_title="FlixRS - Movies recommender system", page_icon="🔍", layout="wide"
 )
 
 with st.sidebar:
-    st.header("🔍 FlixRS")
-    st.write("A movies recommender system")
+    # About section
+    st.header("📝 About FlixRS")
+    st.write("Welcome to FlixRS, an NLP movie recommender system designed \
+        to help you discover your next favorite movies.")
 
-    st.header("📝 About")
-    st.write("About...")
+    st.subheader("How to use")
+    st.write("Just type anything in the search box. FlixRS will try its best\
+        and recommend you some movies based on your input.")
 
+    # Settings section
     st.header("🔧 Settings")
-    st.slider("Number of movies", min_value=0, max_value=20, value=20, step=1)
+    n_movies = st.slider(
+        "Number of movies", min_value=0, max_value=20, value=5, step=1,
+        help="Choose the number of movies to recommend"
+    )
 
     method = st.selectbox(
-        "Method", options=["CountVectorizer", "bert-base-nli-mean-tokens"]
+        "Method/Model",
+        options=["CountVectorizer", "bert-base-nli-mean-tokens", "all-MiniLM-L6-v2"],
+        help="Choose the method/model to use for embedding calculation",
     )
-    dist = st.selectbox("Distance", options=["Cosine similarity", "Euclidean distance"])
+    device_ = st.radio(
+        "Device",
+        options=["cuda", "cpu"],
+        help="Choose device to run the model on (GPU or CPU)",
+    )
+    precalculation = st.radio(
+        "Precalculated embeddings",
+        options=["True", "False"],
+        help="Choose to precalculate embeddings or not (for bert-base-nli-mean-tokens and all-MiniLM-L6-v2)",
+    )
+    dist = st.selectbox(
+        "Distance",
+        options=["Cosine similarity", "Euclidean distance"],
+        help="Choose the distance metric to use for similarity calculation",
+    )
 
 
+# Main content section
 st.header("🔍 FlixIRS - FlixRS Recommender System for movies")
 st.subheader("Movie Recommendation")
-user_request = st.text_input("Anything...", value="")
 
+# User input
+user_request = st.text_input("Anything in your mind...", value="")
+
+# Search button
 if st.button("Search"):
     if user_request == "":
         st.write("Please enter something...")
     else:
-        st.write(method)
-        st.write(dist)
-        st.write("Here are some movies you might like:")
-        st.write(user_request)
-        for i in range(5):
-            st.write(f"{i+1}. Movie {i+1}")
+        st.write("**Here are some movies you might like:**")
+        movies = model.get_recommendations(
+            user_request, device_, method, precalculation, dist, n_movies
+        )
+        movies = movies[['title', 'description', 'country', 'director', 'cast']].reset_index(drop=True)
+        st.table(movies)
 else:
-    st.write("No movies found.")
+    st.write("Enter something and press the search button...")
