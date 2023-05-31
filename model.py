@@ -60,7 +60,7 @@ def get_embeddings(device_, method="all-MiniLM-L6-v2", precalculation="True"):
         return count_matrix
 
     model = SentenceTransformer(method, device=device_)
-    
+
     if precalculation == "True":
         try:
             # Attempt to load precalculated embeddings
@@ -70,22 +70,26 @@ def get_embeddings(device_, method="all-MiniLM-L6-v2", precalculation="True"):
             st.warning(
                 "Precalculated embeddings not found, calculating embeddings", icon="⚠️"
             )
-            with st.spinner('Calculating embeddings...'):
+            with st.spinner("Calculating embeddings..."):
                 start_time = time.time()
                 sentence_embeddings = model.encode(data["description"].values)
                 np.save(f"data/movie_descriptions_{method}.npy", sentence_embeddings)
                 end_time = time.time()
                 elapsed_time = end_time - start_time
-                st.success(f'Done! Elapsed Time: {elapsed_time:.2f} seconds using {device_}')
+                st.success(
+                    f"Done! Elapsed Time: {elapsed_time:.2f} seconds using {device_}"
+                )
     else:
         # Calculate embeddings on the fly
-        with st.spinner('Calculating embeddings...'):
+        with st.spinner("Calculating embeddings..."):
             start_time = time.time()
             sentence_embeddings = model.encode(data["description"].values)
             np.save(f"data/movie_descriptions_{method}.npy", sentence_embeddings)
             end_time = time.time()
             elapsed_time = end_time - start_time
-            st.success(f'Done! Elapsed Time: {elapsed_time:.2f} seconds using {device_}')
+            st.success(
+                f"Done! Elapsed Time: {elapsed_time:.2f} seconds using {device_}"
+            )
 
     return sentence_embeddings
 
