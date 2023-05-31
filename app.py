@@ -16,18 +16,26 @@ st.set_page_config(
 with st.sidebar:
     # About section
     st.header("📝 About FlixRS")
-    st.write("Welcome to FlixRS, an NLP movie recommender system designed \
-        to help you discover your next favorite movies.")
+    st.write(
+        "Welcome to FlixRS, an NLP movie recommender system designed \
+        to help you discover your next favorite movies."
+    )
 
     st.subheader("How to use")
-    st.write("Just type anything in the search box. FlixRS will try its best\
-        and recommend you some movies based on your input.")
+    st.write(
+        "Just type anything in the search box. FlixRS will try its best\
+        and recommend you some movies based on your input."
+    )
 
     # Settings section
     st.header("🔧 Settings")
     n_movies = st.slider(
-        "Number of movies", min_value=0, max_value=20, value=5, step=1,
-        help="Choose the number of movies to recommend"
+        "Number of movies",
+        min_value=0,
+        max_value=20,
+        value=5,
+        step=1,
+        help="Choose the number of movies to recommend",
     )
 
     method = st.selectbox(
@@ -65,10 +73,19 @@ if st.button("Search"):
         st.write("Please enter something...")
     else:
         st.write("**Here are some movies you might like:**")
-        movies = model.get_recommendations(
-            user_request, device_, method, precalculation, dist, n_movies
-        )
-        movies = movies[['title', 'description', 'country', 'director', 'cast']].reset_index(drop=True)
+        try:
+            movies = model.get_recommendations(
+                user_request, device_, method, precalculation, dist, n_movies
+            )
+        except RuntimeError as esc:
+            st.error(
+                "RuntimeError: CUDA out of memory. Consider using CPU or CountVectorizer method."
+            )
+            raise RuntimeError from esc
+
+        movies = movies[
+            ["title", "description", "country", "director", "cast"]
+        ].reset_index(drop=True)
         st.table(movies)
 else:
     st.write("Enter something and press the search button...")

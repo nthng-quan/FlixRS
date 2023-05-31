@@ -5,6 +5,7 @@
     based on user requests.
 """
 
+import time
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -19,10 +20,11 @@ from sklearn.metrics.pairwise import euclidean_distances
 import preprocess
 
 try:
-    data = pd.read_csv('data/netflix_titles_clean.csv')
+    data = pd.read_csv("data/netflix_titles_clean.csv")
 except FileNotFoundError:
-    preprocess.preprocess('data/netflix_titles')
-    data = pd.read_csv('data/netflix_titles_clean.csv')
+    preprocess.preprocess("data/netflix_titles")
+    data = pd.read_csv("data/netflix_titles_clean.csv")
+
 
 def get_embeddings(device_, method="all-MiniLM-L6-v2", precalculation="True"):
     """
@@ -46,32 +48,47 @@ def get_embeddings(device_, method="all-MiniLM-L6-v2", precalculation="True"):
         else:
             # Warning message when CUDA is not available
             st.warning(
-                'CUDA not found, using CPU or consider using precalculated embeddings', icon="⚠️")
+                "CUDA not found, using CPU or consider using precalculated embeddings",
+                icon="⚠️",
+            )
             device_ = "cpu"
 
     if method == "CountVectorizer":
         # Using CountVectorizer method
-        count = CountVectorizer(stop_words='english')
-        count_matrix = count.fit_transform(data['description'])
+        count = CountVectorizer(stop_words="english")
+        count_matrix = count.fit_transform(data["description"])
         return count_matrix
 
     model = SentenceTransformer(method, device=device_)
-    # TODO: Add precalculation progress bar
+    
     if precalculation == "True":
         try:
             # Attempt to load precalculated embeddings
-            sentence_embeddings = np.load(f'data/movie_descriptions_{method}.npy')
+            sentence_embeddings = np.load(f"data/movie_descriptions_{method}.npy")
         except FileNotFoundError:
             # Warning message when precalculated embeddings are not found
-            st.warning('Precalculated embeddings not found, calculating embeddings', icon="⚠️")
-            sentence_embeddings = model.encode(data['description'].values)
-            np.save(f'data/movie_descriptions_{method}.npy', sentence_embeddings)
+            st.warning(
+                "Precalculated embeddings not found, calculating embeddings", icon="⚠️"
+            )
+            with st.spinner('Calculating embeddings...'):
+                start_time = time.time()
+                sentence_embeddings = model.encode(data["description"].values)
+                np.save(f"data/movie_descriptions_{method}.npy", sentence_embeddings)
+                end_time = time.time()
+                elapsed_time = end_time - start_time
+                st.success(f'Done! Elapsed Time: {elapsed_time:.2f} seconds using {device_}')
     else:
         # Calculate embeddings on the fly
-        sentence_embeddings = model.encode(data['description'].values)
-        np.save(f'data/movie_descriptions_{method}.npy', sentence_embeddings)
+        with st.spinner('Calculating embeddings...'):
+            start_time = time.time()
+            sentence_embeddings = model.encode(data["description"].values)
+            np.save(f"data/movie_descriptions_{method}.npy", sentence_embeddings)
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            st.success(f'Done! Elapsed Time: {elapsed_time:.2f} seconds using {device_}')
 
     return sentence_embeddings
+
 
 def get_recommendations(
     user_request,
@@ -79,7 +96,7 @@ def get_recommendations(
     method="all-MiniLM-L6-v2",
     precalculation="True",
     dist="Cosine similarity",
-    n_movies=5
+    n_movies=10,
 ):
     """
     This function is used to get the recommendations based on the user request.
@@ -104,13 +121,13 @@ def get_recommendations(
             device_ = "cuda"
         else:
             # Warning message when CUDA is not available
-            st.warning('CUDA not found, using CPU', icon="⚠️")
+            st.warning("CUDA not found, using CPU", icon="⚠️")
             device_ = "cpu"
 
     if method == "CountVectorizer":
         # Using CountVectorizer method
-        count = CountVectorizer(stop_words='english')
-        sentence_embeddings = count.fit_transform(data['description'])
+        count = CountVectorizer(stop_words="english")
+        sentence_embeddings = count.fit_transform(data["description"])
         request_embeddings = count.transform([user_request])
     else:
         model = SentenceTransformer(method, device=device_)
