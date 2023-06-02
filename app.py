@@ -15,7 +15,7 @@ import model
 # Set page configuration
 st.set_page_config(
     page_title="FlixRS - Movies recommender system",
-    page_icon="🔍",
+    page_icon="🔥",
     initial_sidebar_state="expanded",
     layout="wide",
 )
@@ -73,7 +73,7 @@ with st.sidebar:
     api_key = st.text_input(
         label="API Key",
         placeholder="OpenAI API Key",
-        value="",
+        value="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",
         type="password",
         help="Enter your OpenAI API Key, check your api key in https://platform.openai.com/account/api-keys",
     )
@@ -126,7 +126,11 @@ with tab1:
 with tab2:
     st.header("🤖 FlixRS - FlixRS Chatbot")
     try:
-        st.dataframe(movies)
         chatutils.chat(movies)
-    except NameError:
-        st.write("Please search for some movies first...")
+    except NameError as esc:
+        try:
+            title=movies["title"]
+        except NameError:
+            st.write("Please search for some movies first...")
+        else:
+            st.write(f"Error occured {esc}")
