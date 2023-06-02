@@ -5,6 +5,7 @@
 import asyncio
 from search_engine_parser.core.engines.yahoo import Search as YahooSearch
 
+
 def searcher(query, n_results=5, n_pages=1):
     """
     docstring

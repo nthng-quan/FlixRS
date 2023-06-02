@@ -5,9 +5,9 @@ This app allows users to search for movie recommendations based on their input.
 
 """
 
-import chatutils
 import openai
 import streamlit as st
+import chatutils
 
 # from streamlit_chat import message
 import model
@@ -129,7 +129,7 @@ with tab2:
         chatutils.chat(movies)
     except NameError as esc:
         try:
-            title=movies["title"]
+            title = movies["title"]
         except NameError:
             st.write("Please search for some movies first...")
         else:

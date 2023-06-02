@@ -1,15 +1,13 @@
 """
     docstring
 """
-import openai
 import streamlit as st
-from streamlit_chat import message
 import ref.chat
 
 # openai.api_key = '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'
 def chat(movies) -> None:
     """
-        docstring
+    docstring
     """
     st.subheader("Here are your previous search results:")
     st.dataframe(movies)
@@ -23,14 +21,14 @@ def chat(movies) -> None:
 
         if "past" not in st.session_state:
             st.session_state["past"] = []
-        
+
         st.subheader("💬 Chatting with ChatGPT about the movie/TV series")
         mv_chosen = st.selectbox(
             label="Chat with ChatGPT for more infomation about this movie",
             options=movies,
             help="You can chat with ChatGPT to get more information about the movie",
-            label_visibility="collapsed"
-        ) 
+            label_visibility="collapsed",
+        )
         ref.chat.chatchat(mv_chosen)
     else:
         st.error(
