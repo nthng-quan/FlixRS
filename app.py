@@ -7,10 +7,8 @@ This app allows users to search for movie recommendations based on their input.
 
 import openai
 import streamlit as st
-import chatutils
-
-# from streamlit_chat import message
-import model
+from modules import chat
+from modules import model
 
 # Set page configuration
 st.set_page_config(
@@ -52,7 +50,7 @@ with st.sidebar:
 
     method = st.selectbox(
         "Method/Model",
-        options=["CountVectorizer", "bert-base-nli-mean-tokens", "all-MiniLM-L6-v2"],
+        options=["all-MiniLM-L6-v2", "bert-base-nli-mean-tokens", "CountVectorizer"],
         help="Choose the method/model to use for embedding calculation",
     )
     device_ = st.radio(
@@ -63,7 +61,8 @@ with st.sidebar:
     precalculation = st.radio(
         "Precalculated embeddings",
         options=["True", "False"],
-        help="Choose to precalculate embeddings or not (for bert-base-nli-mean-tokens and all-MiniLM-L6-v2)",
+        help="Choose to precalculate embeddings or not\
+            (only applied to bert-base-nli-mean-tokens and all-MiniLM-L6-v2)",
     )
     dist = st.selectbox(
         "Distance function",
@@ -78,7 +77,6 @@ with st.sidebar:
         help="Enter your OpenAI API Key, check your api key in https://platform.openai.com/account/api-keys",
     )
 
-    # chat.py
     if api_key:
         st.session_state["api_key"] = api_key
         openai.api_key = st.session_state["api_key"]
@@ -87,8 +85,8 @@ with st.sidebar:
             st.session_state["openai"] = True
             st.success("API Key is valid")
         except openai.error.AuthenticationError:
-            st.error("Invalid API Key")
             st.session_state["openai"] = False
+            st.error("Invalid API Key")
 
 with tab1:
     # Main content section
@@ -107,18 +105,19 @@ with tab1:
         else:
             st.write("**Here are some movies you might like:**")
             try:
-                movies = model.get_recommendations(
+                movies_raw = model.get_recommendations(
                     user_request, device_, method, precalculation, dist, n_movies
-                )
+                ).reset_index(drop=True)
             except RuntimeError as esc:
                 st.error(
                     "RuntimeError: CUDA out of memory. Consider using CPU or CountVectorizer method."
                 )
                 raise RuntimeError from esc
 
-            movies = movies[
+            movies = movies_raw[
                 ["title", "description", "country", "director", "cast"]
             ].reset_index(drop=True)
+
             st.table(movies)
     else:
         st.write("Enter something and press the search button...")
@@ -126,7 +125,7 @@ with tab1:
 with tab2:
     st.header("🤖 FlixRS - FlixRS Chatbot")
     try:
-        chatutils.chat(movies)
+        chat.show_chat(movies_raw)
     except NameError as esc:
         try:
             title = movies["title"]

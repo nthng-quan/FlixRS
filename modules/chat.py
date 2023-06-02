@@ -2,35 +2,39 @@
     docstring
 """
 import streamlit as st
-import ref.chat
+from modules.utils import chatutils
 
 # openai.api_key = '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'
-def chat(movies) -> None:
+def show_chat(movies_raw) -> None:
     """
     docstring
     """
     st.subheader("Here are your previous search results:")
+    movies = movies_raw[
+            ["title", "type", "description", "country", "director", "cast"]
+        ].reset_index(drop=True)
+
     st.dataframe(movies)
 
-    # movies = [f"{i+1}. {movie}" for i, movie in enumerate(movies["title"])]
-    # if st.button("Chat"):
     if st.session_state.openai is True:
-        # Define a function to generate a response from ChatGPT
+        models = [model for model in st.session_state["model_list"] if "gpt" in model]
+        # initialize session state
         if "generated" not in st.session_state:
             st.session_state["generated"] = []
 
         if "past" not in st.session_state:
             st.session_state["past"] = []
 
-        st.subheader("💬 Chatting with ChatGPT about the movie/TV series")
+        st.subheader("💬 Chatting with ChatGPT about the Movie/TV show")
         mv_chosen = st.selectbox(
             label="Chat with ChatGPT for more infomation about this movie",
             options=movies,
-            help="You can chat with ChatGPT to get more information about the movie",
+            help="You can chat with ChatGPT to get more information about the Movie/TV show",
             label_visibility="collapsed",
         )
-        ref.chat.chatchat(mv_chosen)
+
+        chatutils.chat(movies_raw, mv_chosen, models)
     else:
         st.error(
-            "Enter your OpenAI API Key, check your api key in https://platform.openai.com/account/api-keys"
+            "Enter your OpenAI API Key, check your api key at https://platform.openai.com/account/api-keys"
         )

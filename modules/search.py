@@ -6,7 +6,7 @@ import asyncio
 from search_engine_parser.core.engines.yahoo import Search as YahooSearch
 
 
-def searcher(query, n_results=5, n_pages=1):
+def searcher(query, n_results=5, n_pages=2):
     """
     docstring
     """
@@ -18,9 +18,9 @@ def searcher(query, n_results=5, n_pages=1):
         asyncio.set_event_loop(loop)
         yresults = ysearch.search(*search_args)
 
-        for title, link, description in zip(
-            yresults["titles"], yresults["links"], yresults["descriptions"]
+        for title, description in zip(
+            yresults["titles"], yresults["descriptions"]
         ):
-            results.append(f"TITLE: {title} LINK: {link} DESCRIPTIONS: {description}")
+            results.append(f"|TITLE: {title} DESCRIPTIONS: {description}")
 
     return results[:n_results]

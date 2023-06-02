@@ -17,7 +17,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.metrics.pairwise import euclidean_distances
-import preprocess
+from modules import preprocess
 
 try:
     data = pd.read_csv("data/netflix_titles_clean.csv")
