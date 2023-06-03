@@ -19,8 +19,8 @@ st.set_page_config(
 )
 
 # # openai session_state variables
-if 'openai' not in st.session_state:
-    st.session_state['openai'] = False
+if "openai" not in st.session_state:
+    st.session_state["openai"] = False
 
 tab1, tab2 = st.tabs(["Recommender", "Chatbot"])
 
@@ -44,6 +44,8 @@ with st.sidebar:
 
             - You can playaround with the settings bellow to see how it affects the recommendations and chatbot response.
 
+            - Change your OpenAI API Key in "Chatbot configuration".
+
             - Documentation: [Github](https://github.com/nthng-quan/FlixRS)
             """
         )
@@ -58,7 +60,7 @@ with st.sidebar:
             value=5,
             step=1,
             help="Choose the number of movies to recommend",
-            key="n_movies"
+            key="n_movies",
         )
 
         method = st.selectbox(
@@ -69,7 +71,7 @@ with st.sidebar:
                 "CountVectorizer",
             ],
             help="Choose the method/model to use for embedding calculation",
-            key="method"
+            key="method",
         )
         precalculation = st.radio(
             "Use precalculated embeddings",
@@ -90,7 +92,7 @@ with st.sidebar:
             help="Choose the distance metric to use for similarity calculation",
             key="dist",
         )
-        
+
     with st.expander("**🤖 Chatbot configuration**"):
         api_key = st.text_input(
             label="🔑 API Key",
@@ -134,7 +136,7 @@ with st.sidebar:
                 "Yahoo search result integrated",
                 value=False,
                 help="Provide search results of chosen movie/TV show from Yahoo to chatbot for better response",
-                key="search_intergrated"
+                key="search_intergrated",
             )
             if search_intergrated:
                 n_results = st.slider(
@@ -144,7 +146,7 @@ with st.sidebar:
                     value=5,
                     step=1,
                     help="Choose the number of results to return (use with caution, too many results may reach the API limit)",
-                    key="n_results"
+                    key="n_results",
                 )
             if st.button("Clear chat", use_container_width=True):
                 chatutils.clear_chat()
@@ -159,8 +161,11 @@ with tab1:
     user_request = st.text_input(
         "Anything in your mind...",
         placeholder="Movie description...",
-        value="A youthful opportunist achieves prosperity by roaming the roads of Los Angeles, documenting calamities and mortality. However, the shadows he captures begin to consume him."
+        value="A youthful opportunist achieves prosperity by roaming the roads of Los Angeles, documenting calamities and mortality. However, the shadows he captures begin to consume him.",
+        key="user_request",
     )
+    c1, c2 = st.columns([1, 1])
+    st.button("Random request", on_click=chatutils.random_request )
 
     # Search button
     if st.button("Search") or user_request != "":

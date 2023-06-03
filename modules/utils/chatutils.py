@@ -1,16 +1,33 @@
 """
 header docstring
 """
+import random
 import openai
 import streamlit as st
 from streamlit_chat import message
 from modules import search
 
+def random_request() -> None:
+    """
+        docstring
+    """
+    requests = [
+        "A youthful opportunist achieves prosperity by roaming the roads of Los Angeles, documenting calamities and mortality. However, the shadows he captures begin to consume him.", # Nightcrawler
+        "A chemistry teacher in high school who is suffering from cancer joins forces with a former student to ensure his family's financial stability by producing and selling crystallized methamphetamine.", # Breaking Bad
+        "Immersed in a captivating drama, this series delves into the inception of a captivating bond between an FBI criminal profiler and a sinister cannibalistic murderer", # Hannibal
+        "A mutated individual who hunts monsters for a living embarks on a fateful journey towards his ultimate fate.", # The Witcher
+        "spaceship, explosion, future" # ...
+    ]   
+
+    st.session_state['user_request']=random.choice(requests)
+
 def check_openai_api_key():
     """
         docstring
     """
-    st.write("Checking API Key")
+    if st.session_state["api_key_opt"] != "":
+        st.session_state["api_key"] = st.session_state["api_key_opt"]
+        st.session_state["api_key_opt"] = ""  
     openai.api_key = st.session_state["api_key"]
     try:
         model_list = [
@@ -71,8 +88,6 @@ def chat(movies, mv_chosen):
             = sg3.button("Cast", use_container_width=True)
         cont\
             = sg4.button("Continue", use_container_width=True)
-
-        st.write(st.session_state)
 
         if info:
             user_input = f"Tell me more about {mv_chosen}"

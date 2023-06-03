@@ -4,7 +4,6 @@ header docstring
 import streamlit as st
 from modules.utils import chatutils
 
-# openai.api_key = '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'
 def show_chat(movies_raw) -> None:
     """
     docstring
@@ -35,6 +34,18 @@ def show_chat(movies_raw) -> None:
         )
         chatutils.chat(movies_raw, mv_chosen)
     else:
+        st.write("🔑 API Key")
         st.error(
-            "Enter your OpenAI API Key, check your api key at https://platform.openai.com/account/api-keys"
+            "Enter your OpenAI API Key to enable the chatbot, check your api key at https://platform.openai.com/account/api-keys"
+        )
+        st.text_input(
+            label="API Key",
+            placeholder="OpenAI API Key",
+            # value="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",
+            value="",
+            type="password",
+            help="Enter your OpenAI API Key, check your api key in https://platform.openai.com/account/api-keys",
+            key="api_key_opt",
+            on_change=chatutils.check_openai_api_key,
+            label_visibility="collapsed",
         )
