@@ -1,12 +1,30 @@
 """
-docstring
+header docstring
 """
 import openai
 import streamlit as st
 from streamlit_chat import message
 from modules import search
 
-# TODO: clear on changing mv_chosen
+def check_openai_api_key():
+    """
+        docstring
+    """
+    st.write("Checking API Key")
+    openai.api_key = st.session_state["api_key"]
+    try:
+        model_list = [
+            x.id for x in openai.Model.list().data
+        ]
+        st.session_state["model_list"] = [
+            model for model in model_list if "gpt" in model
+        ]
+        st.session_state["openai"] = True
+
+    except openai.error.AuthenticationError:
+        st.session_state["openai"] = False
+        st.error("Invalid API Key")
+
 def clear_chat() -> None:
     """
         docstring
@@ -15,67 +33,64 @@ def clear_chat() -> None:
         st.session_state["generated"].pop(i)
         st.session_state["past"].pop(i)
 
+def generate_background_prompt(movies, mv_chosen):
+    """
+        docstring
+    """
+    background_prompt\
+        = [f"INFORMATION FROM DATASET: {str(movies[movies['title'] == mv_chosen].to_dict(orient='records'))}"]
+    if st.session_state.search_intergrated:
+        n_results = st.session_state.n_results
+        background_prompt.append(\
+            f"YAHOO SEARCH: [{str(search.searcher(mv_chosen, n_results, n_pages=1, only_description=True))}]") 
+    background_prompt = str(background_prompt)
+
+    return background_prompt
+
 def chat(movies, mv_chosen):
     """
         docstring
     """
-    # pd, column1, pd1, column2, pd2 = st.columns([0.05, 1.5, 0.05, 6, 0.05])
-    
-    # with column1:
-    #     st.write("**🔍 Search Configuration**")
-    #     n_results = st.slider(
-    #         "Number of results",
-    #         min_value=1,
-    #         max_value=20,
-    #         value=5,
-    #         step=1,
-    #         help="Choose the number of results to return",
-    #     )
-    #     search_intergrated = st.checkbox(
-    #         "Search integrated",
-    #         value=False,
-    #         help="Provide search results of chosen movie/TV show from Yahoo to chatbot",
-    #     )
-
-    search_intergrated = True
-    n_results = 5
-    background_prompt \
-        = [f"INFORMATION FROM DATASET: {str(movies[movies['title'] == mv_chosen].to_dict(orient='records'))}"]
-    if search_intergrated:
-        background_prompt.append(\
-            f"YAHOO SEARCH: [{str(search.searcher(mv_chosen, n_results, n_pages=1, only_description=True))}]")
-    background_prompt = str(background_prompt)
-    
-    # with column2:
+    # user request for chatbot
     running = False
-
     with st.form(key="my_form", clear_on_submit=True):
-        user_input = st.text_input(f"Chat with GPT about **{mv_chosen}**", "", key="input", disabled=running)
+        user_input = st.text_input(
+            f"Chat with GPT about **{mv_chosen}**", "",
+            key="input", disabled=running,
+            help="Its optimal to clear the chat before chatting with another movie")
         submit_button = st.form_submit_button(label='Send', use_container_width=True)
 
-    sg1, sg2, sg3, sg4 = st.columns(4)
-    info\
-        = sg1.button("More information", key="suggest", use_container_width=True)
-    rating\
-        = sg2.button("Rating", key="rating", use_container_width=True)
-    cast\
-        = sg3.button("Cast", key="cast", use_container_width=True)
-    cont\
-        = sg4.button("Continue", key="continue", use_container_width=True)
+    # user request suggestions
+    with st.container():
+        sg1, sg2, sg3, sg4 = st.columns(4)
+        info\
+            = sg1.button("More information", use_container_width=True)
+        rating\
+            = sg2.button("Rating", use_container_width=True)
+        cast\
+            = sg3.button("Cast", use_container_width=True)
+        cont\
+            = sg4.button("Continue", use_container_width=True)
 
-    if info:
-        user_input = "Tell me more about this movie/tv show"
-        submit_button = True
-    if rating:
-        user_input = "What is the rating, IMDb rating,... of this movie/tv show"
-        submit_button = True
-    if cast:
-        user_input = "Who are the cast and directors of this movie/tv show"
-        submit_button = True
-    if cont:
-        user_input = "Continue"
-        submit_button = True
+        st.write(st.session_state)
 
+        if info:
+            user_input = f"Tell me more about {mv_chosen}"
+            submit_button = True
+        if rating:
+            user_input = f"What is the rating, IMDb rating,... of {mv_chosen}"
+            submit_button = True
+        if cast:
+            user_input = f"Who are the cast and directors of {mv_chosen}"
+            submit_button = True
+        if cont:
+            user_input = "Continue"
+            submit_button = True
+        
+    # background prompt
+    background_prompt = generate_background_prompt(movies, mv_chosen)
+
+    # chatbot response
     if submit_button is True and user_input != "":
         with st.spinner("Thinking..."):
             messages = [{"role": "system", "content": background_prompt}]

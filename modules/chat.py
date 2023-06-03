@@ -1,5 +1,5 @@
 """
-    docstring
+header docstring
 """
 import streamlit as st
 from modules.utils import chatutils
@@ -13,6 +13,7 @@ def show_chat(movies_raw) -> None:
     movies = movies_raw[
             ["title", "type", "description", "country", "director", "cast"]
         ].reset_index(drop=True)
+    movies.index += 1
 
     st.dataframe(movies)
 
@@ -29,9 +30,9 @@ def show_chat(movies_raw) -> None:
             label="Chat with ChatGPT for more infomation about this movie",
             options=movies,
             help="You can chat with ChatGPT to get more information about the Movie/TV show",
-            label_visibility="collapsed"
+            label_visibility="collapsed",
+            on_change=chatutils.clear_chat
         )
-
         chatutils.chat(movies_raw, mv_chosen)
     else:
         st.error(
