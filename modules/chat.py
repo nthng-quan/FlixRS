@@ -17,7 +17,6 @@ def show_chat(movies_raw) -> None:
     st.dataframe(movies)
 
     if st.session_state.openai is True:
-        models = [model for model in st.session_state["model_list"] if "gpt" in model]
         # initialize session state
         if "generated" not in st.session_state:
             st.session_state["generated"] = []
@@ -30,10 +29,10 @@ def show_chat(movies_raw) -> None:
             label="Chat with ChatGPT for more infomation about this movie",
             options=movies,
             help="You can chat with ChatGPT to get more information about the Movie/TV show",
-            label_visibility="collapsed",
+            label_visibility="collapsed"
         )
 
-        chatutils.chat(movies_raw, mv_chosen, models)
+        chatutils.chat(movies_raw, mv_chosen)
     else:
         st.error(
             "Enter your OpenAI API Key, check your api key at https://platform.openai.com/account/api-keys"
