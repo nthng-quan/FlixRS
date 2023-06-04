@@ -25,7 +25,6 @@ except FileNotFoundError:
     preprocess.preprocess("data/netflix_titles")
     data = pd.read_csv("data/netflix_titles_clean.csv")
 
-
 def get_embeddings(device, method="all-MiniLM-L6-v2", precalculation="True"):
     """
     This function is used to get the embeddings of the movie descriptions.
@@ -58,6 +57,7 @@ def get_embeddings(device, method="all-MiniLM-L6-v2", precalculation="True"):
                     icon="⚠️",
                 )
             device = "cpu"
+            st.session_state.device = device
 
     if method == "CountVectorizer":
         # Using CountVectorizer method
