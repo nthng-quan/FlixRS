@@ -2,6 +2,8 @@
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://flixrs.streamlit.app/)
 
 [![Docker Image](https://img.shields.io/badge/Docker%20Hub-flixrs-blue)](https://hub.docker.com/r/nthngquan/flixrs)
+
+[![Youtube](https://img.shields.io/badge/Youtube%20Demo-flixrs-red)](https://www.youtube.com/watch?v=U7NR8omlqGs)
 ## Introduction
 FlixRS is an advanced recommender system designed to provide personalized movie recommendations to users based on the similarity between user requests and movie descriptions. Powered by sentence-transformer models, FlixRS leverages natural language processing (NLP) techniques and machine learning algorithms to accurately match user preferences with relevant movies. Additionally, FlixRS features an interactive chatbot, driven by the powerful GPT language model, which can answer user queries and provide detailed information about movies. By integrating with Yahoo search results, the chatbot ensures comprehensive and up-to-date movie insights.
 
