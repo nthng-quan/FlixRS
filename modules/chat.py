@@ -54,7 +54,6 @@ def show_chat(movies_raw) -> None:
         st.text_input(
             label="API Key",
             placeholder="OpenAI API Key",
-            # value="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",
             value="",
             type="password",
             help="Enter your OpenAI API Key, check your api key in https://platform.openai.com/account/api-keys",
