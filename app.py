@@ -19,9 +19,12 @@ st.set_page_config(
     layout="wide",
 )
 
-# openai session_state variables
+# session_state variables
 if "openai" not in st.session_state:
     st.session_state["openai"] = False
+
+if "search_intergrated" not in st.session_state:
+    st.session_state["search_intergrated"] = False
 
 # Create tabs for recommender and chatbot
 tab1, tab2 = st.tabs(["Recommender", "Chatbot"])
@@ -121,7 +124,7 @@ with st.sidebar:
             key="dist",
         )
 
-    with st.expander("**🤖 Chatbot configuration**"):
+    with st.expander("**🤖 Chatbot configuration**", expanded=True):
         # OpenAI API Key input
         api_key = st.text_input(
             label="🔑 API Key",

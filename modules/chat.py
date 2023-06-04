@@ -49,15 +49,9 @@ def show_chat(movies_raw) -> None:
         chatutils.chat(movies_raw, mv_chosen)
     else:
         st.error(
-            "Enter your OpenAI API Key to enable the chatbot, check your api key at https://platform.openai.com/account/api-keys"
+            "Enter your OpenAI API Key in **Chatbot configuration** to enable the chatbot\
+                check your api key at https://platform.openai.com/account/api-keys"
         )
-        st.text_input(
-            label="API Key",
-            placeholder="OpenAI API Key",
-            value="",
-            type="password",
-            help="Enter your OpenAI API Key, check your api key in https://platform.openai.com/account/api-keys",
-            key="api_key_opt",
-            on_change=chatutils.check_openai_api_key,
-            label_visibility="collapsed",
+        st.info(
+            "Or you can use my key: *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*"
         )

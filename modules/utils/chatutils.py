@@ -47,11 +47,7 @@ def check_openai_api_key():
     """
     Checks the OpenAI API key and sets the session state variables.
 
-    'api_key_opt' where user can enter the openAI key in chatbot tab (while 'api_key' is the one
-    in Chatbot configuration)
-
-    If 'api_key_opt' is not empty, it sets the value as the API key and clears 'api_key_opt'.
-    Then, it sets the OpenAI API key and retrieves the list of available models.
+    Sets the OpenAI API key and retrieves the list of available models.
     It filters the models to keep only those with 'gpt' in their ID and stores them in 'model_list'.
     Finally, it sets the 'openai' flag in the session state.
 
@@ -61,11 +57,6 @@ def check_openai_api_key():
     Returns:
         None
     """
-    # Check if 'api_key_opt' is provided and set it as the API key
-    if st.session_state["api_key_opt"] != "":
-        st.session_state["api_key"] = st.session_state["api_key_opt"]
-        st.session_state["api_key_opt"] = ""
-
     # Set the OpenAI API key
     openai.api_key = st.session_state["api_key"]
 
