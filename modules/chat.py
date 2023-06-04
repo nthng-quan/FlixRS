@@ -34,7 +34,6 @@ def show_chat(movies_raw) -> None:
         )
         chatutils.chat(movies_raw, mv_chosen)
     else:
-        st.write("🔑 API Key")
         st.error(
             "Enter your OpenAI API Key to enable the chatbot, check your api key at https://platform.openai.com/account/api-keys"
         )

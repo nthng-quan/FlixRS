@@ -6,6 +6,7 @@ This app allows users to search for movie recommendations based on their input.
 """
 
 import streamlit as st
+import torch
 from modules import chat
 from modules.utils import chatutils
 from modules import model
@@ -94,6 +95,23 @@ with st.sidebar:
             help="Choose device to run the model on - to calculate embeddings (GPU or CPU)",
             key="device",
         )
+
+        if device == "cuda":
+            if torch.cuda.is_available():
+                device = "cuda"
+            else:
+                # Warning message when CUDA is not available
+                if precalculation == "False":
+                    st.warning(
+                        "CUDA not found, using CPU instead or consider using precalculated embeddings for faster results",
+                        icon="⚠️",
+                    )
+                else:
+                    st.warning(
+                        "CUDA not found, using CPU instead if needed",
+                        icon="⚠️",
+                    )
+                device = "cpu"
 
         # Distance function selection
         dist = st.selectbox(
@@ -186,11 +204,11 @@ with tab1:
         value="A youthful opportunist achieves prosperity by roaming the roads of Los Angeles, documenting calamities and mortality. However, the shadows he captures begin to consume him.",
         key="user_request",
     )
-    c1, c2 = st.columns([1, 1])
-    st.button("Random request", on_click=chatutils.random_request)
+    c1, c2 = st.columns([1, 7])
+    c2.button("Random request", on_click=chatutils.random_request)
 
     # Search button
-    if st.button("Search") or user_request != "":
+    if c1.button("Search", use_container_width=True) or user_request != "":
         if user_request == "":
             st.write("Please enter something...")
         else:
