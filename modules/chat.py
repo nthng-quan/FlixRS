@@ -53,5 +53,5 @@ def show_chat(movies_raw) -> None:
                 check your api key at https://platform.openai.com/account/api-keys"
         )
         st.info(
-            "Or you can use my key: *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*"
+            "Or you can use my key (this key will be removed by OpenAI soon as it goes public): *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*"
         )
