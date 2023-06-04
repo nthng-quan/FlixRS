@@ -1,17 +1,31 @@
 """
-header docstring
+    Displaying previous search results and initiating a chat with the ChatGPT chatbot.
+
+    Functions:
+    - show_chat(movies_raw): Displays previous search results and allows users to initiate a chat with the ChatGPT chatbot.
+
+    Usage:
+    - Ensure that an OpenAI API key is set to enable the chatbot functionality.
+    - Enter the API key in the designated text input field.
+    - Select a movie from the displayed search results to initiate a chat with the ChatGPT chatbot.
 """
 import streamlit as st
 from modules.utils import chatutils
 
+
 def show_chat(movies_raw) -> None:
     """
-    docstring
+    Display search results and enable chat with ChatGPT about a Movie/TV show.
+
+    Parameters
+    ----------
+    movies_raw : pandas.DataFrame
+        data containing information about the recommended movies/TV shows.
     """
     st.subheader("Here are your previous search results:")
     movies = movies_raw[
-            ["title", "type", "description", "country", "director", "cast"]
-        ].reset_index(drop=True)
+        ["title", "type", "description", "country", "director", "cast"]
+    ].reset_index(drop=True)
     movies.index += 1
 
     st.dataframe(movies)
@@ -30,7 +44,7 @@ def show_chat(movies_raw) -> None:
             options=movies,
             help="You can chat with ChatGPT to get more information about the Movie/TV show",
             label_visibility="collapsed",
-            on_change=chatutils.clear_chat
+            on_change=chatutils.clear_chat,
         )
         chatutils.chat(movies_raw, mv_chosen)
     else:

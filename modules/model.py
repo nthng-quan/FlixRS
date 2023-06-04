@@ -6,11 +6,10 @@
 """
 
 import time
+import os
 import numpy as np
 import pandas as pd
 import streamlit as st
-
-import torch
 
 from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import CountVectorizer
@@ -24,6 +23,7 @@ try:
 except FileNotFoundError:
     preprocess.preprocess("data/netflix_titles")
     data = pd.read_csv("data/netflix_titles_clean.csv")
+
 
 def get_embeddings(device, method="all-MiniLM-L6-v2", precalculation="True"):
     """
@@ -47,23 +47,30 @@ def get_embeddings(device, method="all-MiniLM-L6-v2", precalculation="True"):
         count_matrix = count.fit_transform(data["description"])
         return count_matrix
 
-    precalculation_dir = 'data/model/precalculated_embeddings/'
-    model_cache_dir = 'data/model/cache/'
+    precalculation_dir = "data/model/precalculated_embeddings/"
+    model_cache_dir = "data/model/cache/"
+
     model = SentenceTransformer(method, device=device, cache_folder=model_cache_dir)
-    
+
     if precalculation == "True":
         try:
             # Attempt to load precalculated embeddings
-            sentence_embeddings = np.load(f"{precalculation_dir}movie_descriptions_{method}.npy")
+            sentence_embeddings = np.load(
+                f"{precalculation_dir}movie_descriptions_{method}.npy"
+            )
         except FileNotFoundError:
             # Warning message when precalculated embeddings are not found
             st.warning(
-                "Precalculated embeddings not found, calculating embeddings...", icon="⚠️"
+                "Precalculated embeddings not found, calculating embeddings...",
+                icon="⚠️",
             )
             with st.spinner(f"Calculating embeddings using {device}..."):
                 start_time = time.time()
                 sentence_embeddings = model.encode(data["description"].values)
-                np.save(f"{precalculation_dir}movie_descriptions_{method}.npy", sentence_embeddings)
+                np.save(
+                    f"{precalculation_dir}movie_descriptions_{method}.npy",
+                    sentence_embeddings,
+                )
                 end_time = time.time()
                 elapsed_time = end_time - start_time
                 st.success(
@@ -77,9 +84,7 @@ def get_embeddings(device, method="all-MiniLM-L6-v2", precalculation="True"):
             np.save(f"data/movie_descriptions_{method}.npy", sentence_embeddings)
             end_time = time.time()
             elapsed_time = end_time - start_time
-            st.success(
-                f"Done! Elapsed Time: {elapsed_time:.2f} seconds using {device}"
-            )
+            st.success(f"Done! Elapsed Time: {elapsed_time:.2f} seconds using {device}")
 
     return sentence_embeddings
 
@@ -110,7 +115,7 @@ def get_recommendations(
         pandas.DataFrame: The recommended movies based on the user request.
 
     """
-    model_cache_dir = 'data/model/cache/'
+    model_cache_dir = "data/model/cache/"
 
     if method == "CountVectorizer":
         # Using CountVectorizer method
@@ -119,7 +124,16 @@ def get_recommendations(
         request_embeddings = count.transform([user_request])
     else:
         # Using SentenceTransformer models
-        model = SentenceTransformer(method, device=device, cache_folder=model_cache_dir)
+        with st.spinner(f"Loading model {method} / {device}..."):
+            # check if model is already downloaded
+            if not os.path.exists(
+                os.path.join(model_cache_dir, f"sentence-transformers_{method}")
+            ):
+                st.info(f"Downloading {method} for the first run...")
+            model = SentenceTransformer(
+                method, device=device, cache_folder=model_cache_dir
+            )
+
         request_embeddings = [model.encode(user_request)]
         sentence_embeddings = get_embeddings(device, method, precalculation)
 
